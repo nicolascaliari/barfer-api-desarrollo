@@ -10,12 +10,12 @@ export class CreatePaymentDto {
   token: string;
 
   @IsNumber()
-  @IsNotEmpty()
-  payment_method_id: number;
+  @IsOptional()
+  payment_method_id?: number;
 
   @IsString()
-  @IsNotEmpty()
-  bin: string;
+  @IsOptional()
+  bin?: string;
 
   @IsNumber()
   @IsNotEmpty()

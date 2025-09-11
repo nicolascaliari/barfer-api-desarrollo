@@ -30,6 +30,16 @@ export class PaywayController {
   }
 
   /**
+   * Endpoint 3: Get available payment methods
+   * Returns payment methods with their BIN ranges for matching
+   */
+  @Get('payment-methods')
+  @Auth(Roles.User)
+  async getPaymentMethods() {
+    return this.paywayService.getPaymentMethods();
+  }
+
+  /**
    * Additional endpoint: Get payment details
    * Useful for checking payment status
    */

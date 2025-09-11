@@ -55,7 +55,7 @@ export class PaywayService {
 
   /**
    * Process a payment using a token
-   * This endpoint uses the private API key
+   * This endpoint uses the private API key and automatically resolves payment_method_id from BIN
    */
   async createPayment(createPaymentDto: CreatePaymentDto): Promise<PaymentResponseDto> {
     if (!this.privateApiKey) {
@@ -65,15 +65,67 @@ export class PaywayService {
       );
     }
 
+    let paymentMethodId = createPaymentDto.payment_method_id;
+    let binCode = createPaymentDto.bin;
+
+    // If payment_method_id is not provided, we need to get it from BIN matching
+    if (!paymentMethodId) {
+      // First, we need to get the BIN from the token if not provided
+      if (!binCode) {
+        // Get BIN from token by making a test call or from token structure
+        // For now, we'll require either payment_method_id or bin to be provided
+        throw new HttpException(
+          'Either payment_method_id or bin must be provided for automatic method resolution',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Get payment methods and find matching BIN
+      try {
+        const paymentMethods = await this.getPaymentMethods();
+        
+        // Find the payment method that matches the BIN
+        let foundMethod = null;
+        for (const method of paymentMethods) {
+          if (method.bins && Array.isArray(method.bins)) {
+            const matchingBin = method.bins.find((binInfo: any) => 
+              binCode.startsWith(binInfo.bin) || binInfo.bin.startsWith(binCode)
+            );
+            if (matchingBin) {
+              foundMethod = method;
+              break;
+            }
+          }
+        }
+
+        if (!foundMethod) {
+          throw new HttpException(
+            `No payment method found for BIN: ${binCode}`,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        paymentMethodId = foundMethod.id;
+        console.log(`Auto-resolved payment_method_id: ${paymentMethodId} for BIN: ${binCode}`);
+      } catch (error) {
+        console.error('Error resolving payment method from BIN:', error);
+        throw new HttpException(
+          'Failed to resolve payment method from BIN',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+
     const url = `${this.baseUrl}/payments`;
     const headers = {
       'Content-Type': 'application/json',
       'apikey': this.privateApiKey,
     };
 
-    // Add site_id to the payment data if not provided
+    // Prepare payment data with resolved payment_method_id
     const paymentData = {
       ...createPaymentDto,
+      payment_method_id: paymentMethodId,
       site_id: createPaymentDto.site_id || this.siteId,
     };
 
@@ -87,6 +139,39 @@ export class PaywayService {
       );
       throw new HttpException(
         error.response?.data?.message || 'Failed to process Payway payment',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Get available payment methods with their BIN ranges
+   * This endpoint helps match BIN codes to payment_method_id
+   */
+  async getPaymentMethods(): Promise<any> {
+    if (!this.privateApiKey) {
+      throw new HttpException(
+        'Payway private API key is not configured',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
+
+    const url = `${this.baseUrl}/payment_methods`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': this.privateApiKey,
+    };
+
+    try {
+      const response = await axios.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      console.error(
+        'Error getting Payway payment methods:',
+        error.response ? error.response.data : error.message,
+      );
+      throw new HttpException(
+        error.response?.data?.message || 'Failed to get Payway payment methods',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
