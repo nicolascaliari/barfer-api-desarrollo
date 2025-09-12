@@ -39,7 +39,7 @@ export class AddressService {
   }
 
   async findOneById(id: string) {
-    const addressData = await this.addressModel.findById({ _id: id }).exec();
+    const addressData = await this.addressModel.findById(id).exec();
     if (!addressData) {
       return new NotFoundException('Address not found');
     }

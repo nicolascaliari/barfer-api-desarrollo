@@ -43,7 +43,7 @@ export class CategoriesService {
 
   async findOne(id: string) {
     try {
-      const category = await this.categoryModel.findById({ _id: id }).exec();
+      const category = await this.categoryModel.findById(id).exec();
       if (!category) {
         throw new BadRequestException('Category not found');
       }
