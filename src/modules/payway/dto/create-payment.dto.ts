@@ -1,6 +1,10 @@
+import { IsObject } from 'class-validator';
 import { IsNotEmpty, IsString, IsNumber, IsOptional, IsArray } from 'class-validator';
 
 export class CreatePaymentDto {
+  @IsString()
+  @IsOptional()
+  user_id?: string;
   @IsString()
   @IsNotEmpty()
   site_transaction_id: string;
@@ -10,8 +14,8 @@ export class CreatePaymentDto {
   token: string;
 
   @IsNumber()
-  @IsNotEmpty()
-  payment_method_id: number;
+  @IsOptional()
+  payment_method_id?: number;
 
   @IsString()
   @IsNotEmpty()
@@ -44,4 +48,8 @@ export class CreatePaymentDto {
   @IsString()
   @IsOptional()
   site_id?: string;
+
+  @IsObject()
+  @IsOptional()
+  fraud_detection?: any;
 }
