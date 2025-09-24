@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentResponseDto } from './dto/payment-response.dto';
@@ -82,33 +81,5 @@ export class PaywayService {
       });
     });
   }
-
-  /**
-   * Consulta los medios de pago disponibles en Payway y los muestra por consola
-   * @param currency Opcional, identificador de la moneda (ej: 'ARS')
-   */
-  async getPaymentMethods(currency?: string): Promise<void> {
-    if (!this.privateApiKey) {
-      throw new HttpException(
-        'Payway private API key is not configured',
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
-    }
-
-    try {
-      const baseUrl = 'https://developers-ventasonline.payway.com.ar/api/v2/payment-methods/';
-      const url = currency ? `${baseUrl}?currency=${currency}` : baseUrl;
-      const response = await axios.get(url, {
-        headers: {
-          Accept: 'application/json',
-          apikey: this.privateApiKey,
-        },
-      });
-      console.log('Medios de pago Payway:', response.data);
-    } catch (error) {
-      console.error('Error consultando medios de pago Payway:', error?.response?.data || error.message);
-    }
-  }
-
 
 }
