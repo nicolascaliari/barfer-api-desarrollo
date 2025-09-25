@@ -169,6 +169,16 @@ export class OrdersService {
       };
     }
 
+    // Procesar pago con Payway si corresponde
+    if (PaymentMethods[createOrderDto.paymentMethod] === PaymentMethods[12]) {
+      await this.googleSheetsService.addOrderToSheet(orderSaved);
+
+      return {
+        BFOrder: orderSaved,
+        paymentType: 'payway',
+      };
+    }
+
     // Para otros métodos de pago
     await this.googleSheetsService.addOrderToSheet(orderSaved);
     await this.googleSheetsService.verifyDataInSheet();

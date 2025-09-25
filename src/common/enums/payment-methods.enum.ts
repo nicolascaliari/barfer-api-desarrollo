@@ -10,4 +10,5 @@ export const PaymentMethods = {
   9: 'bank-transfer',
   10: 'crypto',
   11: 'mercado-pago',
+  12: 'payway',
 };
