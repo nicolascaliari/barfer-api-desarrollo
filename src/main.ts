@@ -12,7 +12,8 @@ async function main() {
       'http://localhost:3000',
       'https://barf-ecommerce-client.vercel.app',
       'https://www.barferalimento.com',
-      'http://localhost:3000',
+      'https://barfer-client-git-feature-payway-integration-barfers-projects.vercel.app',
+      
     ],
     // credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
