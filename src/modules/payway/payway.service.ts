@@ -44,7 +44,7 @@ export class PaywayService {
       currency: createPaymentDto.currency,
       installments: createPaymentDto.installments,
       description: createPaymentDto.description,
-      payment_type: createPaymentDto.payment_type,
+      payment_type: 'single',
       sub_payments: createPaymentDto.sub_payments,
       site_id: createPaymentDto.site_id,
       fraud_detection: createPaymentDto.fraud_detection, // Este campo debe venir del frontend
