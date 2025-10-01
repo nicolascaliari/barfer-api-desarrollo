@@ -24,6 +24,9 @@ interface RequestWithUser extends Request {
     email: string;
     role: string;
   };
+  headers: {
+    authorization?: string;
+  } & Request['headers'];
 }
 
 @Controller('auth')
