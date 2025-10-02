@@ -34,8 +34,6 @@ export class PaywayService {
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     }
-    console.log('createPaymentDto', createPaymentDto);
-    // Agregar objeto fraud_detection manualmente
     const paymentData = {
       site_transaction_id: createPaymentDto.site_transaction_id,
       token: createPaymentDto.token,

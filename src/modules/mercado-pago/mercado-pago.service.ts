@@ -18,8 +18,23 @@ export class MercadoPagoService {
       Authorization: `Bearer ${this.accessToken}`,
     };
 
+
+        // Armamos el payload para Mercado Pago
+        const payload = {
+          ...createMercadoPagoDto,
+          payment_methods: {
+            excluded_payment_types: [
+              { id: 'credit_card' },
+              { id: 'debit_card' },
+              { id: 'ticket' },
+              { id: 'bank_transfer' },
+            ],
+          },
+          auto_return: 'approved',
+        };
+
     try {
-      const response = await axios.post(url, createMercadoPagoDto, { headers });
+      const response = await axios.post(url, payload, { headers });
       return response.data;
     } catch (error) {
       console.error(
